@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>Study Quest Pixel RPG｜像素讀書冒險</title>
+<style>
+  :root {
+    --bg: #10152d;
+    --panel: #1a2345;
+    --panel-2: #263565;
+    --text: #fff8dc;
+    --muted: #b8c3e8;
+    --purple: #a78bfa;
+    --pink: #fb7185;
+    --yellow: #ffd84d;
+    --cyan: #70e1f5;
+    --green: #78f0a1;
+    --border: #58689a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--text);
+    font-family: "Courier New", "Noto Sans TC", monospace;
+    image-rendering: pixelated;
+    background:
+      radial-gradient(circle at 12% 5%, rgba(124,58,237,.28), transparent 27rem),
+      radial-gradient(circle at 90% 20%, rgba(14,165,233,.16), transparent 24rem),
+      var(--bg);
+  }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+  .wrap { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 42px; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:24px; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .logo { display:grid; place-items:center; width:48px; height:48px; border-radius:4px; font-size:25px; background:linear-gradient(135deg,#8b5cf6,#ec4899); border:3px solid #f8d66d; box-shadow:4px 4px 0 #070b1a; }
+  h1 { font-size:clamp(1.35rem,3vw,2rem); margin:0; letter-spacing:-.04em; }
+  .subtitle { color:var(--muted); font-size:.88rem; margin-top:4px; }
+  .pill { border:2px solid #647db6; background:#ffffff0a; border-radius:2px; padding:9px 13px; color:#dbeafe; font-size:.82rem; white-space:nowrap; box-shadow:3px 3px 0 #080d20; }
+  .hero { display:grid; grid-template-columns:1.2fr .8fr; gap:18px; margin-bottom:18px; }
+  .panel { background:linear-gradient(145deg,rgba(29,40,80,.98),rgba(21,29,59,.99)); border:3px solid var(--border); border-radius:4px; padding:22px; box-shadow:5px 5px 0 #070b1a; }
+  .hero-main { position:relative; overflow:hidden; background:linear-gradient(120deg,#4c1d95,#6d28d9 55%,#4338ca); border-color:#c4b5fd; }
+  .hero-main:after { content:"✦"; position:absolute; right:28px; top:8px; color:#fde68a; font-size:100px; opacity:.2; transform:rotate(15deg); pointer-events:none; }
+  .eyebrow { color:#ddd6fe; text-transform:uppercase; font-size:.74rem; letter-spacing:.14em; font-weight:800; }
+  .hero h2 { margin:8px 0 5px; font-size:clamp(1.65rem,4vw,2.4rem); letter-spacing:-.04em; }
+  .hero p { color:#ede9fe; margin:0 0 18px; line-height:1.6; max-width:540px; }
+  .level-row { display:flex; align-items:center; gap:12px; margin-top:20px; }
+  .level-badge { display:grid; place-items:center; flex-shrink:0; width:58px; height:58px; border-radius:3px; color:#422006; background:linear-gradient(145deg,#fef08a,#f59e0b); border:3px solid #fff1a8; font-weight:950; font-size:1.35rem; box-shadow:4px 4px 0 #7c2d12; }
+  .level-info { flex:1; min-width:0; }
+  .level-info-top { display:flex; justify-content:space-between; gap:8px; font-size:.88rem; font-weight:800; margin-bottom:9px; }
+  .track { height:11px; border-radius:999px; background:#11182755; overflow:hidden; }
+  .fill { width:0%; height:100%; border-radius:inherit; background:linear-gradient(90deg,#facc15,#fb923c); transition:width .3s ease; }
+  .small-note { color:#ddd6fe; font-size:.78rem; margin-top:8px; }
+  .stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .stat { border-radius:3px; padding:17px; background:#ffffff08; border:2px solid var(--border); box-shadow:3px 3px 0 #080d20; }
+  .stat-icon { font-size:1.35rem; margin-bottom:10px; }
+  .stat-value { font-size:1.8rem; font-weight:900; letter-spacing:-.04em; }
+  .stat-label { color:var(--muted); font-size:.82rem; margin-top:3px; }
+  .stat:nth-child(1) .stat-value { color:var(--cyan); }
+  .stat:nth-child(2) .stat-value { color:var(--green); }
+  .stat:nth-child(3) .stat-value { color:var(--yellow); }
+  .stat:nth-child(4) .stat-value { color:var(--pink); }
+  .content { display:grid; grid-template-columns: .82fr 1.18fr; gap:18px; align-items:start; }
+  .section-title { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 16px; font-size:1.1rem; text-shadow:2px 2px 0 #080d20; }
+  .section-title span { display:flex; align-items:center; gap:9px; }
+  .section-title small { color:var(--muted); font-size:.78rem; font-weight:500; }
+  label { display:block; font-size:.83rem; color:#dbeafe; margin-bottom:7px; font-weight:700; }
+  .field { margin-bottom:14px; }
+  input, select { width:100%; border:2px solid #647db6; border-radius:2px; padding:12px 13px; background:#0b122a; color:var(--text); outline:none; }
+  input:focus, select:focus { border-color:var(--purple); box-shadow:0 0 0 3px #a78bfa22; }
+  input::placeholder { color:#7180a6; }
+  .btn { border:3px solid #f3d889; border-radius:2px; padding:12px 15px; font-weight:900; text-transform:uppercase; letter-spacing:.02em; transition:transform .08s,filter .15s; box-shadow:4px 4px 0 #080d20; }
+  .btn:hover { filter:brightness(1.08); transform:translateY(-1px); }
+  .btn:active { transform:translateY(0); }
+  .btn-primary { width:100%; color:#24104d; background:linear-gradient(100deg,#c4b5fd,#f0abfc); box-shadow:4px 4px 0 #080d20; }
+  .tip { display:flex; gap:10px; align-items:flex-start; margin-top:17px; padding:12px; border-radius:12px; background:#67e8f90d; color:#bae6fd; font-size:.8rem; line-height:1.5; }
+  .quest-list { display:flex; flex-direction:column; gap:10px; }
+  .quest { display:flex; align-items:center; gap:12px; padding:14px; border-radius:3px; border:2px solid var(--border); background:#ffffff06; box-shadow:3px 3px 0 #080d20; transition:opacity .2s,background .2s; }
+  .quest.done { background:#4ade800d; border-color:#4ade8033; }
+  .check-btn { width:34px; height:34px; border-radius:2px; flex-shrink:0; border:3px solid #7180a6; color:#071323; background:transparent; display:grid; place-items:center; font-weight:900; }
+  .done .check-btn { border-color:var(--green); background:var(--green); }
+  .quest-body { flex:1; min-width:0; }
+  .quest-name { font-weight:800; overflow-wrap:anywhere; }
+  .done .quest-name { color:#9ca3af; text-decoration:line-through; }
+  .quest-meta { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:6px; color:var(--muted); font-size:.75rem; }
+  .subject-tag { border-radius:2px; background:#a78bfa20; color:#ddd6fe; padding:3px 7px; border:1px solid #8b5cf6; }
+  .xp-tag { color:#fde68a; font-weight:900; }
+  .delete-btn { border:0; border-radius:9px; background:transparent; color:#94a3b8; font-size:1.1rem; padding:7px; }
+  .delete-btn:hover { color:#fda4af; background:#fb71851a; }
+  .empty { text-align:center; padding:34px 15px; color:var(--muted); border:2px dashed #647db6; border-radius:3px; }
+  .empty .emoji { font-size:2.1rem; margin-bottom:8px; }
+  .empty strong { display:block; color:#e2e8f0; margin-bottom:5px; }
+  .list-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:15px; color:var(--muted); font-size:.78rem; }
+  .text-btn { border:0; background:transparent; color:#c4b5fd; font-weight:800; padding:6px 0; }
+  .text-btn:hover { color:#f0abfc; }
+  .toast { position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); opacity:0; pointer-events:none; background:#facc15; color:#1f2937; padding:12px 18px; border:3px solid #fff1a8; border-radius:2px; font-weight:900; box-shadow:4px 4px 0 #000; transition:.25s; z-index:5; text-align:center; width:max-content; max-width:calc(100% - 32px); }
+  .toast.show { opacity:1; transform:translate(-50%,0); }
+  footer { text-align:center; color:#64748b; font-size:.76rem; padding-top:25px; }
+  @media (max-width:760px) {
+    .wrap { width:min(100% - 22px,560px); padding-top:18px; }
+    header { align-items:flex-start; }
+    .pill { font-size:.72rem; padding:7px 9px; }
+    .hero, .content { grid-template-columns:1fr; }
+    .panel { padding:17px; border-radius:18px; }
+    .hero-main { min-height:250px; }
+    .stats { grid-template-columns:1fr 1fr; }
+  }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
+</style>
+
+<style id="pixel-art-theme">
+  /* Pixel Art theme override: keep the original app logic, upgrade only the presentation. */
+  :root {
+    --bg:#090d20; --panel:#151a38; --panel-2:#22284d; --text:#f8fafc;
+    --muted:#a5b4d4; --purple:#c4b5fd; --pink:#f9a8d4; --yellow:#fde047;
+    --cyan:#67e8f9; --green:#86efac; --border:#59618d;
+  }
+  body {
+    background-color:var(--bg);
+    background-image:
+      linear-gradient(rgba(129,140,248,.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(129,140,248,.055) 1px, transparent 1px),
+      radial-gradient(ellipse at 50% 0%, #312e8160, transparent 60%);
+    background-size:8px 8px, 8px 8px, auto;
+    font-family:"Courier New", "Noto Sans TC", monospace;
+    image-rendering:pixelated;
+  }
+  .logo {
+    border-radius:4px; border:3px solid #fef08a;
+    box-shadow:4px 4px 0 #312e81, 0 0 0 3px #0b1024;
+    background:linear-gradient(135deg,#7c3aed,#db2777);
+  }
+  h1, h2, .eyebrow, .level-badge, .stat-value, .btn, .quest-name, .section-title {
+    letter-spacing:0;
+    text-shadow:1px 1px 0 rgba(0,0,0,.22);
+  }
+  .pill, .panel, .stat, .quest, .empty, input, select, .btn, .tip, .level-badge, .toast {
+    border-radius:4px !important;
+  }
+  .panel {
+    border:3px solid var(--border);
+    box-shadow:5px 5px 0 #050816;
+    background-color:var(--panel);
+    background-image:linear-gradient(135deg,rgba(255,255,255,.025) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.025) 50%,rgba(255,255,255,.025) 75%,transparent 75%,transparent);
+    background-size:8px 8px;
+  }
+  .hero-main {
+    border-color:#a78bfa;
+    background-image:
+      linear-gradient(180deg,transparent 70%,rgba(8,12,34,.32)),
+      linear-gradient(120deg,#312e81,#5b21b6 55%,#3730a3);
+  }
+  .hero-main:after { content:"✦  ▪  ✧"; right:16px; top:18px; font-size:38px; letter-spacing:8px; opacity:.65; }
+  .level-badge {
+    border:3px solid #fff1a8; border-radius:4px !important;
+    box-shadow:4px 4px 0 #92400e;
+    background:linear-gradient(135deg,#fef08a,#f59e0b);
+  }
+  .track { border:2px solid #c4b5fd; border-radius:2px; background:#090d20; height:15px; }
+  .fill { border-radius:0; background:repeating-linear-gradient(90deg,#fde047 0 10px,#f59e0b 10px 12px); }
+  .stat { border:2px solid #3f4a77; border-radius:4px; background:#0b122a; }
+  .stat:nth-child(1) .stat-value { color:#67e8f9; }
+  .stat:nth-child(2) .stat-value { color:#86efac; }
+  .stat:nth-child(3) .stat-value { color:#fde047; }
+  .stat:nth-child(4) .stat-value { color:#f9a8d4; }
+  input, select { border:2px solid #59618d; background:#080d22; border-radius:3px !important; }
+  input:focus, select:focus { border-color:#fde047; box-shadow:3px 3px 0 #7c3aed; }
+  .btn-primary {
+    color:#21103f; border:2px solid #fef08a; border-radius:3px !important;
+    background:repeating-linear-gradient(135deg,#f0abfc 0 8px,#c4b5fd 8px 16px);
+    box-shadow:4px 4px 0 #6d28d9;
+  }
+  .btn-primary:hover { filter:brightness(1.12); transform:translate(-1px,-1px); }
+  .quest { border:2px solid #3f4a77; background:#0b122a; }
+  .quest.done { border-color:#4ade80; background:#102b2b; }
+  .check-btn { border-radius:3px; border-width:2px; }
+  .check-btn:hover { border-color:#fde047; }
+  .subject-tag { border:1px solid #8b5cf6; border-radius:2px; }
+  .xp-tag { font-family:"Courier New",monospace; }
+  .delete-btn { border-radius:3px; }
+  .tip { border:1px dashed #67e8f9; background:#082f4933; }
+  .empty { border:2px dashed #59618d; background:#0b122a; }
+  .toast { border:3px solid #fff1a8; border-radius:3px !important; box-shadow:4px 4px 0 #6d28d9; }
+  .pill { border:2px solid #59618d; border-radius:3px !important; background:#151a38; }
+  .section-title small { font-family:"Courier New",monospace; }
+  footer { font-family:"Courier New",monospace; }
+  @media (max-width:760px) {
+    .panel { box-shadow:4px 4px 0 #050816; }
+    .hero-main:after { font-size:26px; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true">⚔️</div>
+      <div>
+        <h1>Study Quest</h1>
+        <div class="subtitle">把讀書變成一場冒險！</div>
+      </div>
+    </div>
+    <div class="pill">▣ PIXEL RPG · 學習公會</div>
+  </header>
+
+  <section class="hero">
+    <div class="panel hero-main">
+      <div class="eyebrow">Your learning adventure</div>
+      <h2>準備好升級了嗎？</h2>
+      <p>每完成一個讀書任務，就能獲得經驗值。累積 XP、提升等級，成為更強大的知識冒險者！</p>
+      <div class="level-row">
+        <div class="level-badge" id="levelBadge">1</div>
+        <div class="level-info">
+          <div class="level-info-top"><span id="levelName">📘 新手學徒 Lv.1</span><span id="xpLabel">0 / 100 XP</span></div>
+          <div class="track" role="progressbar" aria-label="升級進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="levelProgress"><div class="fill" id="levelFill"></div></div>
+          <div class="small-note" id="nextLevelText">再獲得 100 XP 就能升級！</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2 class="section-title"><span>🏆 冒險者數據</span><small>YOUR STATS</small></h2>
+      <div class="stats">
+        <div class="stat"><div class="stat-icon">✨</div><div class="stat-value" id="totalXp">0</div><div class="stat-label">累積 XP</div></div>
+        <div class="stat"><div class="stat-icon">✅</div><div class="stat-value" id="doneCount">0</div><div class="stat-label">完成任務</div></div>
+        <div class="stat"><div class="stat-icon">📜</div><div class="stat-value" id="taskCount">0</div><div class="stat-label">任務總數</div></div>
+        <div class="stat"><div class="stat-icon">🎯</div><div class="stat-value" id="completionRate">0%</div><div class="stat-label">完成率</div></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="content">
+    <section class="panel">
+      <h2 class="section-title"><span>🪄 發布新任務</span></h2>
+      <form id="taskForm">
+        <div class="field">
+          <label for="taskName">任務名稱</label>
+          <input id="taskName" name="taskName" maxlength="100" placeholder="例如：複習細胞生物學" required>
+        </div>
+        <div class="field">
+          <label for="subject">選擇科目</label>
+          <select id="subject" name="subject">
+            <option value="生物學">🧬 生物學</option>
+            <option value="化學">⚗️ 化學</option>
+            <option value="英文">🔤 英文</option>
+            <option value="數學">📐 數學</option>
+            <option value="其他">📚 其他</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit">＋ 接受新任務 <span aria-hidden="true">✦</span></button>
+      </form>
+      <div class="tip"><span>💡</span><span><strong>冒險小提示：</strong>把大目標拆成小任務，完成一項就能獲得 <b>20 XP</b>！每天前進一小步，也是一種升級。</span></div>
+    </section>
+
+    <section class="panel">
+      <h2 class="section-title"><span>🗺️ 任務佈告欄</span><small id="questCount">0 個任務</small></h2>
+      <div id="questList" class="quest-list" aria-live="polite"></div>
+      <div class="list-footer">
+        <span id="listSummary">你的冒險即將開始！</span>
+        <button class="text-btn" id="clearDoneBtn" type="button">清除已完成</button>
+      </div>
+    </section>
+  </main>
+  <footer>Study Quest · 每一次努力，都讓你更接近下一個等級 ✦</footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+  const STORAGE_KEY = "studyQuestSave_v1";
+  const XP_PER_TASK = 20;
+  const XP_PER_LEVEL = 100;
+  const $ = (id) => document.getElementById(id);
+  let state = { tasks: [], xp: 0, nextId: 1 };
+  let toastTimer;
+
+  function loadState() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      if (parsed && Array.isArray(parsed.tasks)) {
+        state.tasks = parsed.tasks.filter(t => t && typeof t.name === "string").map(t => ({
+          id: Number(t.id) || Date.now() + Math.random(),
+          name: t.name.slice(0, 100),
+          subject: typeof t.subject === "string" ? t.subject : "其他",
+          done: Boolean(t.done)
+        }));
+        state.xp = Math.max(0, Number(parsed.xp) || 0);
+        state.nextId = Math.max(Number(parsed.nextId) || 1, ...state.tasks.map(t => Number(t.id) + 1), 1);
+      }
+    } catch (error) {
+      console.warn("無法讀取保存資料，將使用新的冒險紀錄。", error);
+    }
+  }
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+      showToast("⚠️ 瀏覽器無法保存資料，請檢查儲存空間設定");
+    }
+  }
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    })[char]);
+  }
+  function showToast(message) {
+    const toast = $("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
+  }
+  function getLevelName(level) {
+    if (level >= 10) return "👑 傳說級學者";
+    if (level >= 5) return "🧙 知識大法師";
+    if (level >= 3) return "🛡️ 熟練冒險者";
+    if (level >= 2) return "⚔️ 見習冒險者";
+    return "📘 新手學徒";
+  }
+  function render() {
+    const level = Math.floor(state.xp / XP_PER_LEVEL) + 1;
+    const xpInLevel = state.xp % XP_PER_LEVEL;
+    const doneCount = state.tasks.filter(t => t.done).length;
+    const total = state.tasks.length;
+    const rate = total ? Math.round(doneCount / total * 100) : 0;
+
+    $("levelBadge").textContent = level;
+    $("levelName").textContent = `${getLevelName(level)} Lv.${level}`;
+    $("xpLabel").textContent = `${xpInLevel} / ${XP_PER_LEVEL} XP`;
+    $("levelFill").style.width = `${xpInLevel}%`;
+    $("levelProgress").setAttribute("aria-valuenow", String(xpInLevel));
+    $("nextLevelText").textContent = `再獲得 ${XP_PER_LEVEL - xpInLevel} XP 就能升級！`;
+    $("totalXp").textContent = state.xp;
+    $("doneCount").textContent = doneCount;
+    $("taskCount").textContent = total;
+    $("completionRate").textContent = `${rate}%`;
+    $("questCount").textContent = `${total} 個任務`;
+    $("listSummary").textContent = total ? `已完成 ${doneCount} / ${total} 項任務` : "你的冒險即將開始！";
+
+    const list = $("questList");
+    if (!total) {
+      list.innerHTML = '<div class="empty"><div class="emoji">🧭</div><strong>目前還沒有任務</strong><span>新增第一個讀書任務，開始你的冒險吧！</span></div>';
+      return;
+    }
+    list.innerHTML = state.tasks.map(task => `
+      <article class="quest ${task.done ? "done" : ""}">
+        <button class="check-btn" type="button" data-action="toggle" data-id="${task.id}" aria-label="${task.done ? "取消完成" : "標記完成"}：${escapeHTML(task.name)}" title="${task.done ? "取消完成" : "完成任務"}">${task.done ? "✓" : ""}</button>
+        <div class="quest-body">
+          <div class="quest-name">${escapeHTML(task.name)}</div>
+          <div class="quest-meta"><span class="subject-tag">${escapeHTML(task.subject)}</span><span class="xp-tag">${task.done ? "✓ 已領取 XP" : `✦ +${XP_PER_TASK} XP`}</span></div>
+        </div>
+        <button class="delete-btn" type="button" data-action="delete" data-id="${task.id}" aria-label="刪除任務：${escapeHTML(task.name)}" title="刪除任務">✕</button>
+      </article>
+    `).join("");
+  }
+
+  $("taskForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const name = $("taskName").value.trim();
+    if (!name) {
+      showToast("請先輸入任務名稱！");
+      $("taskName").focus();
+      return;
+    }
+    state.tasks.unshift({ id: state.nextId++, name, subject: $("subject").value, done: false });
+    saveState();
+    render();
+    $("taskForm").reset();
+    $("taskName").focus();
+    showToast("🗺️ 新任務已加入佈告欄！");
+  });
+
+  $("questList").addEventListener("click", event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+    const id = Number(button.dataset.id);
+    const task = state.tasks.find(t => t.id === id);
+    if (!task) return;
+
+    if (button.dataset.action === "toggle") {
+      task.done = !task.done;
+      if (task.done) {
+        state.xp += XP_PER_TASK;
+        showToast(`✨ 任務完成！獲得 +${XP_PER_TASK} XP`);
+        const before = Math.floor((state.xp - XP_PER_TASK) / XP_PER_LEVEL) + 1;
+        const after = Math.floor(state.xp / XP_PER_LEVEL) + 1;
+        if (after > before) setTimeout(() => showToast(`🎉 LEVEL UP！你升到了 Lv.${after}！`), 500);
+      } else {
+        state.xp = Math.max(0, state.xp - XP_PER_TASK);
+        showToast(`任務已重新開啟，扣回 ${XP_PER_TASK} XP`);
+      }
+    } else if (button.dataset.action === "delete") {
+      if (!confirm(`確定要刪除任務「${task.name}」嗎？`)) return;
+      state.tasks = state.tasks.filter(t => t.id !== id);
+      showToast("任務已從佈告欄移除");
+    }
+    saveState();
+    render();
+  });
+
+  $("clearDoneBtn").addEventListener("click", () => {
+    const completed = state.tasks.filter(t => t.done).length;
+    if (!completed) {
+      showToast("目前沒有已完成的任務");
+      return;
+    }
+    if (!confirm(`確定清除 ${completed} 個已完成任務嗎？已獲得的 XP 會保留。`)) return;
+    state.tasks = state.tasks.filter(t => !t.done);
+    saveState();
+    render();
+    showToast("已清除完成任務，XP 紀錄保留！");
+  });
+
+  loadState();
+  render();
+})();
+</script>
+</body>
+</html>
